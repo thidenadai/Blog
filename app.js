@@ -53,6 +53,57 @@ app.get('/', (req, res) => {
     ;
 });
 
+app.post('/cadastrar_post', (req, res) => {
+
+    const { titulo, conteudo } = req.body;
+
+    
+    const query = 'SELECT * FROM posts WHERE titulo= ? AND conteudo = SHA1(?)';
+    db.query(query, [titulo, conteudo], (err, results) => {
+        if (err) throw err;
+    
+        if (results.length > 0) {
+        
+            res.redirect('/register_failed');
+        } else {
+            
+            const query = 'INSERT INTO blog (titulo, conteudo) VALUES (?, SHA1(?))';
+            console.log(`POST /CADASTAR -> query -> ${query}`);
+            db.query(query, [titulo, conteudo], (err, results) => {
+                console.log(results);
+            
+                if (err) {
+                    console.log(`ERRO NO CADASTRO: ${err}`);
+                    throw err;
+                }
+                if (results.affectedRows > 0) {
+                    req.session.loggedin = true;
+                    req.session.username = username;
+                    res.redirect('/register_ok');
+                }
+            });
+        }
+    });
+
+})
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    =/const query = 'INSERT * INTO posts (titulo, conteudo) VALUES (?,?)';
+
+    db.query(query, [titulo, conteudo], (err, results) => {
+        if (err) throw err;
+
+        if (results.length > 0) {
+        console.log("Deu certo o cadastro do post!")
+            res.redirect('/dashboard');
+        } else {
+            // res.send('Credenciais incorretas. <a href="/">Tente novamente</a>');
+            res.redirect('/login_failed');
+        }
+    });
+});
 // Rota para a página de login
 app.get('/login', (req, res) => {
     // Quando for renderizar páginas pelo EJS, passe parametros para ele em forma de JSON
